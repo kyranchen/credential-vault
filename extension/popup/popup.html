@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Credential Vault</title>
+  <style>
+    body { font-family: system-ui, sans-serif; width: 320px; margin: 0; padding: 16px; }
+    h3 { margin: 0 0 12px; font-size: 15px; }
+    .credential-item { border: 1px solid #e0e0e0; border-radius: 6px; padding: 10px 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+    .credential-name { font-weight: 600; font-size: 13px; }
+    .credential-user { color: #666; font-size: 12px; margin-top: 2px; }
+    button.fill-btn { background: #2563eb; color: white; border: none; border-radius: 4px; padding: 6px 12px; cursor: pointer; font-size: 12px; }
+    button.fill-btn:disabled { background: #93c5fd; cursor: not-allowed; }
+    #status { font-size: 12px; color: #666; margin-top: 8px; }
+    #auth-section input { display: block; width: 100%; box-sizing: border-box; margin-bottom: 8px; padding: 6px 8px; border: 1px solid #ccc; border-radius: 4px; }
+    #auth-section button { width: 100%; padding: 8px; background: #2563eb; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    .error { color: #dc2626; font-size: 12px; margin-top: 4px; }
+  </style>
+</head>
+<body>
+  <h3>Credential Vault</h3>
+
+  <div id="auth-section" style="display:none">
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="login-password" placeholder="Password" />
+    <button id="login-btn">Sign in</button>
+    <p class="error" id="auth-error"></p>
+  </div>
+
+  <div id="main-section" style="display:none">
+    <div id="credentials-list"></div>
+    <p id="status"></p>
+    <button id="logout-btn" style="margin-top:8px; background:none; border:none; color:#666; font-size:12px; cursor:pointer;">Sign out</button>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

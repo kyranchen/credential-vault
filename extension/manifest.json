@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "Credential Vault",
+  "version": "0.1.0",
+  "description": "Auto-fill team credentials from the Credential Vault.",
+
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+
+  "background": {
+    "service_worker": "background.js"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["https://*/*", "http://*/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "Credential Vault"
+  },
+
+  "host_permissions": [
+    "http://localhost:8080/*"
+  ]
+}

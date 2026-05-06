@@ -1,0 +1,42 @@
+spring:
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/credentialvault}
+
+  # Prevent plaintext passwords appearing in any Spring logs
+  security:
+    user:
+      name: disabled
+      password: disabled
+
+server:
+  port: 8080
+  # Ensure request details are not logged (passwords can appear in request bodies)
+  tomcat:
+    accesslog:
+      enabled: false
+
+jwt:
+  # Generate with: openssl rand -base64 32
+  # Must be ≥256 bits (32 bytes) for HMAC-SHA256. Store in env var, never in source.
+  secret: ${JWT_SECRET}
+  expiration-ms: ${JWT_EXPIRATION_MS:86400000}  # 24h default
+
+vault:
+  local:
+    # Generate with: openssl rand -base64 32
+    # This is the MVP local key. Swap for Azure Key Vault in production.
+    master-key: ${VAULT_MASTER_KEY}
+    key-reference: vault-key-v1
+
+cors:
+  # Local dev default: http://localhost:5173  (Vite's default port)
+  # Override for production: CORS_ALLOWED_ORIGIN=https://app.credvault.com
+  allowed-origin: ${CORS_ALLOWED_ORIGIN:http://localhost:5173}
+
+logging:
+  level:
+    root: INFO
+    com.credentialvault: DEBUG
+    # Ensure Spring Security debug logs never print request details in prod
+    org.springframework.security: WARN

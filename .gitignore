@@ -1,0 +1,30 @@
+# Maven
+backend/target/
+backend/.mvn/
+!backend/.mvn/wrapper/maven-wrapper.jar
+!backend/.mvn/wrapper/maven-wrapper.properties
+
+# IDE
+.idea/
+*.iml
+*.iws
+.vscode/
+*.class
+
+# Spring Boot
+backend/src/main/resources/application-local.yml
+
+# Node / Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+
+# Secrets — NEVER commit these
+*.env
+.env.*
+application-secrets.yml
+
+# OS
+.DS_Store
+Thumbs.db

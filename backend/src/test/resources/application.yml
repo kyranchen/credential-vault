@@ -1,0 +1,16 @@
+spring:
+  data:
+    mongodb:
+      # Overridden at runtime by @ServiceConnection — this value is a placeholder
+      uri: mongodb://localhost:27017/credentialvault-test
+
+jwt:
+  # Test-only 32-byte key — safe to commit, never used in production
+  secret: dGVzdC1qd3Qtc2VjcmV0LTMyLWJ5dGVzLWV4YWN0bHk=
+  expiration-ms: 3600000
+
+vault:
+  local:
+    # Test-only AES-256 key — safe to commit, never used in production
+    master-key: dGVzdC1hZXMtMjU2LWtleS0zMi1ieXRlcy1leGFjdCE=
+    key-reference: vault-key-v1

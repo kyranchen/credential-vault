@@ -48,7 +48,9 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of(allowedOrigin));
+        // setAllowedOriginPatterns supports wildcards; setAllowedOrigins does not.
+        // chrome-extension://* covers any extension ID (changes per installation/browser).
+        config.setAllowedOriginPatterns(List.of(allowedOrigin, "chrome-extension://*"));
         config.setAllowedMethods(List.of("GET", "POST", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

@@ -5,6 +5,11 @@
 const API_BASE = 'http://localhost:8080';
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (message.type === 'LOGIN') {
+    handleLogin(message.email, message.password).then(sendResponse);
+    return true;
+  }
+
   if (message.type === 'USE_CREDENTIAL') {
     handleUseCredential(message.credentialId).then(sendResponse);
     return true; // keeps the channel open for the async response
@@ -16,10 +21,31 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   }
 
   if (message.type === 'LOGOUT') {
-    chrome.storage.local.remove(['token', 'orgId']);
+    chrome.storage.local.remove(['token']);
     sendResponse({ ok: true });
   }
 });
+
+async function handleLogin(email, password) {
+  try {
+    const res = await fetch(`${API_BASE}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      return { error: data.error ?? 'Invalid credentials' };
+    }
+
+    const { token } = await res.json();
+    await chrome.storage.local.set({ token });
+    return { ok: true };
+  } catch (e) {
+    return { error: 'Could not reach server' };
+  }
+}
 
 async function handleUseCredential(credentialId) {
   const { token } = await chrome.storage.local.get('token');

@@ -1,5 +1,3 @@
-const API_BASE = 'http://localhost:8080';
-
 document.addEventListener('DOMContentLoaded', async () => {
   const { token } = await chrome.storage.local.get('token');
   if (token) {
@@ -22,20 +20,25 @@ document.getElementById('login-btn').addEventListener('click', async () => {
   const errorEl = document.getElementById('auth-error');
   errorEl.textContent = '';
 
+  // Route through background service worker — popup pages are subject to CORS
+  // but background service workers bypass it for URLs in host_permissions
+  let result;
   try {
-    const res = await fetch(`${API_BASE}/api/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    });
-
-    if (!res.ok) throw new Error('Invalid credentials');
-
-    const { token } = await res.json();
-    await chrome.storage.local.set({ token });
-    showMain();
+    result = await chrome.runtime.sendMessage({ type: 'LOGIN', email, password });
   } catch (e) {
-    errorEl.textContent = e.message;
+    errorEl.textContent = 'Background service worker unavailable — try reloading the extension';
+    return;
+  }
+
+  if (!result) {
+    errorEl.textContent = 'No response from background worker — reload the extension at chrome://extensions';
+    return;
+  }
+
+  if (result.error) {
+    errorEl.textContent = result.error;
+  } else {
+    showMain();
   }
 });
 
@@ -101,14 +104,29 @@ async function fillCredential(credentialId, btn, tabId) {
     return;
   }
 
-  await chrome.tabs.sendMessage(tabId, {
-    type: 'FILL_CREDENTIAL',
-    username: result.username,
-    password: result.password
-  });
+  let fillResult;
+  try {
+    fillResult = await chrome.tabs.sendMessage(tabId, {
+      type: 'FILL_CREDENTIAL',
+      username: result.username,
+      password: result.password
+    });
+  } catch {
+    // Content script not injected — user needs to refresh the page
+    document.getElementById('status').textContent = 'Refresh the page and try again';
+    btn.disabled = false;
+    btn.textContent = 'Fill';
+    return;
+  }
 
-  btn.textContent = 'Filled';
-  // Close popup after short delay so user sees confirmation
+  if (!fillResult?.filled) {
+    document.getElementById('status').textContent = fillResult?.reason ?? 'Could not find form fields';
+    btn.disabled = false;
+    btn.textContent = 'Fill';
+    return;
+  }
+
+  btn.textContent = 'Filled ✓';
   setTimeout(() => window.close(), 800);
 }
 
